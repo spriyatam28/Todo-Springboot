@@ -1,5 +1,6 @@
 package com.xyz.vnsiva.task.todo;
 
+import com.xyz.vnsiva.task.common.constants.ExceptionConstants;
 import com.xyz.vnsiva.task.todo.dto.TodoRequest;
 import com.xyz.vnsiva.task.todo.dto.TodoResponse;
 import com.xyz.vnsiva.task.todo.mapper.TodoMapper;
@@ -8,6 +9,7 @@ import com.xyz.vnsiva.task.user.dto.UserResponse;
 import com.xyz.vnsiva.task.user.exception.UserNotFoundException;
 import com.xyz.vnsiva.task.user.mapper.UserMapper;
 import jakarta.transaction.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -47,7 +49,7 @@ public class TodoService {
 
     public TodoResponse todoById(Long userId, Long todoId) {
         Todo todo = todoRepository.findByUserIdAndTodoId(userId, todoId)
-                .orElseThrow(() -> new TodoNotFoundException("Todo not found"));
+                .orElseThrow(() -> new TodoNotFoundException(ExceptionConstants.todoNotFoundException));
 
         return todoMapper.toResponse(todo);
     }
@@ -73,7 +75,7 @@ public class TodoService {
     @Transactional
     public TodoResponse update(Long userId, Long todoId, TodoRequest todoDto) {
         Todo savedTodo = todoRepository.findByUserIdAndTodoId(userId, todoId)
-                .orElseThrow(() -> new TodoNotFoundException("Todo not found"));
+                .orElseThrow(() -> new TodoNotFoundException(ExceptionConstants.todoNotFoundException));
 
         if (!savedTodo.getTitle().equals(todoDto.title())) {
             savedTodo.setTitle(todoDto.title());
@@ -92,5 +94,20 @@ public class TodoService {
     @Transactional
     public Integer deleteAll(Long userId) {
         return todoRepository.deleteAllByUserId(userId);
+    }
+
+    @Transactional
+    public Integer deleteById(Long userId, Long todoId) {
+        int deletedTodoCount = todoRepository.deleteTodoById(userId, todoId);
+
+        if (deletedTodoCount == 0) {
+            throw new TodoNotFoundException(ExceptionConstants.todoNotFoundException);
+        }
+
+        if (deletedTodoCount > 1) {
+            throw new DataIntegrityViolationException(ExceptionConstants.dataIntegrityException);
+        }
+
+        return deletedTodoCount;
     }
 }

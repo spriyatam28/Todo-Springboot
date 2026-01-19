@@ -42,4 +42,9 @@ public class TodoController {
     public ResponseEntity<Integer> deleteAllTodos(@PathVariable Long userId) {
         return ResponseEntity.status(HttpStatus.OK).body(todoService.deleteAll(userId));
     }
+
+    @DeleteMapping("/{userId}/{todoId}")
+    public ResponseEntity<Integer> deleteTodoById(@PathVariable Long userId, @PathVariable Long todoId) {
+        return ResponseEntity.status(HttpStatus.OK).body(todoService.deleteById(userId, todoId));
+    }
 }
