@@ -3,12 +3,15 @@ package com.xyz.vnsiva.task.todo;
 import com.xyz.vnsiva.task.todo.dto.TodoRequest;
 import com.xyz.vnsiva.task.todo.dto.TodoResponse;
 import com.xyz.vnsiva.task.todo.mapper.TodoMapper;
-import com.xyz.vnsiva.task.user.User;
 import com.xyz.vnsiva.task.user.UserService;
 import com.xyz.vnsiva.task.user.dto.UserResponse;
 import com.xyz.vnsiva.task.user.exception.UserNotFoundException;
 import com.xyz.vnsiva.task.user.mapper.UserMapper;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class TodoService {
@@ -17,20 +20,39 @@ public class TodoService {
     private final UserService userService;
     private final UserMapper userMapper;
 
-    public TodoService(TodoRepository todoRepository, TodoMapper todoMapper, UserService userService, UserMapper userMapper) {
+    public TodoService(
+            TodoRepository todoRepository,
+            TodoMapper todoMapper,
+            UserService userService,
+            UserMapper userMapper
+    ) {
         this.todoMapper = todoMapper;
         this.todoRepository = todoRepository;
         this.userService = userService;
         this.userMapper = userMapper;
     }
 
+    public List<TodoResponse> allTodo(Long userId) {
+        UserResponse user = userService.getUserByID(userId);
+
+        if (user == null) {
+            throw new UserNotFoundException(userId);
+        }
+
+        return todoRepository.findTodosByUserId(userId)
+                .stream()
+                .map(todoMapper::toResponse)
+                .toList();
+    }
+
     public TodoResponse todoById(Long userId, Long todoId) {
         Todo todo = todoRepository.findByUserIdAndTodoId(userId, todoId)
-                .orElseThrow(() -> new TodoNotFoundException("Todo not found or does not belong to user"));
+                .orElseThrow(() -> new TodoNotFoundException("Todo not found"));
 
         return todoMapper.toResponse(todo);
     }
 
+    @Transactional
     public TodoResponse create(TodoRequest todoDto) {
         UserResponse savedUser = userService.getUserByID(todoDto.userId());
         Todo todo = new Todo();
@@ -46,5 +68,29 @@ public class TodoService {
         Todo savedTodo = todoRepository.save(todo);
 
         return todoMapper.toResponse(savedTodo);
+    }
+
+    @Transactional
+    public TodoResponse update(Long userId, Long todoId, TodoRequest todoDto) {
+        Todo savedTodo = todoRepository.findByUserIdAndTodoId(userId, todoId)
+                .orElseThrow(() -> new TodoNotFoundException("Todo not found"));
+
+        if (!savedTodo.getTitle().equals(todoDto.title())) {
+            savedTodo.setTitle(todoDto.title());
+        }
+
+        savedTodo.setBody(String.valueOf(todoDto.body()));
+        savedTodo.setCompleted(todoDto.completed());
+        savedTodo.setDueDate(todoDto.dueDate());
+        savedTodo.setEditedAt(LocalDateTime.now());
+
+        todoRepository.save(savedTodo);
+
+        return todoMapper.toResponse(savedTodo);
+    }
+
+    @Transactional
+    public Integer deleteAll(Long userId) {
+        return todoRepository.deleteAllByUserId(userId);
     }
 }

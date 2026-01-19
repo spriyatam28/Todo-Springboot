@@ -1,4 +1,4 @@
-package com.xyz.vnsiva.task.common.Constants;
+package com.xyz.vnsiva.task.common.constants;
 
 public class ExceptionConstants {
     public static String userIdNotFoundException = "User id not found: ";

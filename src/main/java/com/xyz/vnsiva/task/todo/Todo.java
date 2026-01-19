@@ -25,11 +25,12 @@ public class Todo {
     @Column(nullable = false)
     private Boolean completed = false;
 
-    @Column(nullable = false)
+    @Column(name = "due_date", nullable = false)
     private LocalDateTime dueDate;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+    @Column(name = "edited_at")
     private LocalDateTime editedAt;
 
     @PrePersist

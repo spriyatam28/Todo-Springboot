@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -19,11 +18,9 @@ public class TodoController {
         this.todoService = todoService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<Todo>> allTodo() {
-        List<Todo> todos = new ArrayList<>();
-
-        return ResponseEntity.status(HttpStatus.OK).body(todos);
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<TodoResponse>> allTodo(@PathVariable Long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(todoService.allTodo(userId));
     }
 
     @GetMapping("/{userId}/{todoId}")
@@ -34,5 +31,15 @@ public class TodoController {
     @PostMapping
     public ResponseEntity<TodoResponse> createTodo(@Valid @RequestBody TodoRequest todo) {
         return ResponseEntity.status(HttpStatus.CREATED).body(todoService.create(todo));
+    }
+
+    @PutMapping("/{userId}/{todoId}")
+    public ResponseEntity<TodoResponse> updateTodo(@PathVariable Long userId, @PathVariable Long todoId, @Valid @RequestBody TodoRequest todoRequest) {
+        return ResponseEntity.status(HttpStatus.OK).body(todoService.update(userId, todoId, todoRequest));
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Integer> deleteAllTodos(@PathVariable Long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(todoService.deleteAll(userId));
     }
 }
