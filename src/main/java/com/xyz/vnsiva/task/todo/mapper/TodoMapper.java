@@ -10,6 +10,7 @@ import java.util.Optional;
 public class TodoMapper {
     public TodoResponse toResponse(Todo todo) {
         return new TodoResponse(
+                todo.getId(),
                 todo.getTitle(),
                 Optional.ofNullable(todo.getBody()),
                 todo.getDueDate(),

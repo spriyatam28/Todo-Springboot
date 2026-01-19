@@ -4,8 +4,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
-public interface TodoRepository extends JpaRepository<Long, Todo> {
-    @Query("SELECT title, body,dueDate, completed FROM Todo WHERE id = :id")
-    Todo findById(Long id);
+public interface TodoRepository extends JpaRepository<Todo, Long> {
+    @Query("""
+            SELECT t
+            FROM Todo t
+            JOIN t.user u
+            WHERE u.id = :userId
+            AND t.id = :todoId
+            """)
+    Optional<Todo> findByUserIdAndTodoId(Long userId, Long todoId);
 }

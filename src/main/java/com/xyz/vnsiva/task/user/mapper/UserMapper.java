@@ -23,4 +23,14 @@ public class UserMapper {
                 user.getEmail()
         );
     }
+
+    public User responseToEntity(UserResponse userResponse) {
+        User user = new User();
+
+        user.setId(userResponse.id());
+        user.setName(userResponse.name());
+        user.setEmail(userResponse.email());
+
+        return user;
+    }
 }
