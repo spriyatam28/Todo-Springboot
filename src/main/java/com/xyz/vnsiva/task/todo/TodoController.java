@@ -28,13 +28,22 @@ public class TodoController {
         return ResponseEntity.ok(todoService.todoById(userId, todoId));
     }
 
+    @GetMapping("/status/{userId}/{completed}")
+    public ResponseEntity<List<TodoResponse>> getTodoByCompletionStatus(@PathVariable Long userId, @PathVariable Boolean completed) {
+        return ResponseEntity.status(HttpStatus.OK).body(todoService.todoByCompletionStatus(userId, completed));
+    }
+
     @PostMapping
     public ResponseEntity<TodoResponse> createTodo(@Valid @RequestBody TodoRequest todo) {
         return ResponseEntity.status(HttpStatus.CREATED).body(todoService.create(todo));
     }
 
     @PutMapping("/{userId}/{todoId}")
-    public ResponseEntity<TodoResponse> updateTodo(@PathVariable Long userId, @PathVariable Long todoId, @Valid @RequestBody TodoRequest todoRequest) {
+    public ResponseEntity<TodoResponse> updateTodo(
+            @PathVariable Long userId,
+            @PathVariable Long todoId,
+            @Valid @RequestBody TodoRequest todoRequest
+    ) {
         return ResponseEntity.status(HttpStatus.OK).body(todoService.update(userId, todoId, todoRequest));
     }
 

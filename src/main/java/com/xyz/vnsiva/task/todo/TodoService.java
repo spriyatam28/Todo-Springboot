@@ -54,6 +54,13 @@ public class TodoService {
         return todoMapper.toResponse(todo);
     }
 
+    public List<TodoResponse> todoByCompletionStatus(Long userId, Boolean completed) {
+        return todoRepository.todoByCompletionStatus(userId, completed)
+                .stream()
+                .map(todoMapper::toResponse)
+                .toList();
+    }
+
     @Transactional
     public TodoResponse create(TodoRequest todoDto) {
         UserResponse savedUser = userService.getUserByID(todoDto.userId());

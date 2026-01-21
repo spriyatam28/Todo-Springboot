@@ -1,4 +1,4 @@
-package com.xyz.vnsiva.task.status.health;
+package com.xyz.vnsiva.task.health;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,8 +11,8 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/service")
-public class TaskStatusController {
-    @GetMapping("/status")
+public class TaskHealthController {
+    @GetMapping("/health")
     public ResponseEntity<Map<String, Object>> root() {
         Map<String, Object> response = new HashMap<>();
         response.put("status", "active");
