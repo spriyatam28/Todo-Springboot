@@ -3,6 +3,7 @@ package com.xyz.vnsiva.task.todo;
 import com.xyz.vnsiva.task.common.constants.ExceptionConstants;
 import com.xyz.vnsiva.task.todo.dto.TodoRequest;
 import com.xyz.vnsiva.task.todo.dto.TodoResponse;
+import com.xyz.vnsiva.task.todo.exception.TodoNotFoundException;
 import com.xyz.vnsiva.task.todo.mapper.TodoMapper;
 import com.xyz.vnsiva.task.user.UserService;
 import com.xyz.vnsiva.task.user.dto.UserResponse;
@@ -67,11 +68,9 @@ public class TodoService {
         Todo todo = new Todo();
 
         todo.setTitle(todoDto.title());
-        todo.setBody(String.valueOf(todoDto.body()));
+        todo.setBody(todoDto.body().orElse(null));
         todo.setDueDate(todoDto.dueDate());
         todo.setCompleted(todoDto.completed());
-        todo.setCreatedAt(todoDto.createdAt());
-        todo.setEditedAt(todoDto.editedAt());
         todo.setUser(userMapper.responseToEntity(savedUser));
 
         Todo savedTodo = todoRepository.save(todo);
@@ -88,7 +87,7 @@ public class TodoService {
             savedTodo.setTitle(todoDto.title());
         }
 
-        savedTodo.setBody(String.valueOf(todoDto.body()));
+        savedTodo.setBody(todoDto.body().orElse(null));
         savedTodo.setCompleted(todoDto.completed());
         savedTodo.setDueDate(todoDto.dueDate());
         savedTodo.setEditedAt(LocalDateTime.now());
